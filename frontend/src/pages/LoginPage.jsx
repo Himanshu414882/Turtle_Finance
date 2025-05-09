@@ -36,7 +36,16 @@ const LoginPage = () => {
       );
 
       console.log('Login successful:', res.data);
-      navigate('/adminautharized/admin/clients');
+      const role = res.data.role;
+
+      if (role === "admin") {
+        navigate('/adminautharized/admin/clients');
+      } else if (role === "client") {
+        navigate('/clientautharized/client/dashboard'); // Update this route to your actual client dashboard route
+      } else {
+        setError("Unknown role. Please contact support.");
+      }
+  
     } catch (err) {
       console.error('Login failed:', err.response?.data);
       setError(err.response?.data?.message || 'Login failed');

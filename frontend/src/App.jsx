@@ -3,7 +3,9 @@ import { Routes, Route, Navigate } from "react-router-dom"; // Add Navigate here
 
 import LoginPage from "./pages/LoginPage";
 import AdminPrivateRoutes from "../ProtectedRoutes/AdminPrivateRoutes";
+import ClientPrivateRoute from "../ProtectedRoutes/ClientPrivateRoutes";
 import AdminLayout from "./layouts/AdminLayout";
+import ClientLayout from "./layouts/ClientLayout";
 
 const App = () => {
   return (
@@ -23,7 +25,18 @@ const App = () => {
           </AdminPrivateRoutes>
         }
       />
+
+<Route
+  path="/clientautharized/*"
+  element={
+    <ClientPrivateRoute>
+      <ClientLayout />
+    </ClientPrivateRoute>
+  }
+/>
     </Routes>
+
+
   );
 };
 

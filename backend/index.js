@@ -12,6 +12,8 @@ const { advisorRoutes } = require('./routes/advisorRoutes');
 const { meetingAndTasksRoutes } = require('./routes/meetingAndTaskRoutes');
 const { firefliesRouter } = require('./fireFlies/fetchFromFireflies');
 const { rowWiseTaskRoutes } = require('./routes/rowWiseTaskRoutes');
+const { riskProfileRoutes } = require('./routes/clientRoutes/riskProfileRoutes')
+const kycRoutes = require("./routes/clientRoutes/kycRoutes");
 const cors = require('cors');
 
 // Initialize constants
@@ -39,6 +41,9 @@ app.use('/admin',advisorRoutes);
 app.use('/admin',firefliesRouter);
 app.use('/admin',meetingAndTasksRoutes);
 app.use('/admin',rowWiseTaskRoutes);
+
+app.use('/client',riskProfileRoutes);
+app.use("/client", kycRoutes);
 
 // Auth routes (these might not need protection)
 app.use('/auth', authRoutes);
