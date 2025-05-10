@@ -141,7 +141,7 @@ const RiskProfileSchema = new mongoose.Schema(
             type: String,
             enum:["I am a novice. I don’t understand the markets at all",
                 "I have basic understanding of investing. I understand the risks and basic investment",
-                "I have an amateur interest in investing. I have invested earlier on my own. I understand how markets fluctuate and the pros and cons of different investment classes.3-5 years",
+                "I have an amateur interest in investing. I have invested earlier on my own. I understand how markets fluctuate and the pros and cons of different investment classes.",
                 "I am an experienced investor. I have invested in different markets and understand different investment strategies. I have my own investment philosophy.",
                
             ],

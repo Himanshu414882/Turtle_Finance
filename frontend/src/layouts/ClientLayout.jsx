@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import axios from 'axios';
+import useDigio from './useDigio'; // Path to your hook
 
 const ClientLayout = () => {
   // State to manage the current step in the onboarding process
@@ -529,11 +530,73 @@ const [file, setFile] = useState(null);
   };
 
 
+
+   const [loadingSign, setLoadingSign] = useState(false);
+  const [errorSign, setErrorSign] = useState(null);
+  const [successSign, setSuccessSign] = useState(false);
+  const digioLoaded = useDigio();
+
+  const handleSubmitSign = async (e) => {
+    e.preventDefault();
+    setLoadingSign(true);
+    setErrorSign(null);
+    setSuccessSign(false);
+
+    if (!digioLoaded) {
+      setErrorSign("Digio service is still loading. Please try again.");
+      return;
+    }
+
+    try {
+      // Initialize Digio
+      const digioOptions = {
+        environment: "sandbox",
+        callback: (response) => {
+          console.log("Digio Callback Response:", response);
+          if (response.hasOwnProperty("error_code")) {
+            setErrorSign("Error during signing.");
+          } else {
+            setSuccessSign(true);
+
+            handleNextStep();
+          }
+        },
+        logo: "https://www.jockey.in/cdn/shop/files/Jockey_logo.webp?width=666",
+        is_redirection_approach: false,
+        //redirect_url: window.location.origin + "/uploadPan",
+        theme: {
+          primaryColor: "#5A2989",
+          secondaryColor: "#669698",
+          fontFamily: 'Barlow',
+          fontUrl: 'https://fonts.googleapis.com/css?family=Barlow'
+        }
+      };
+
+      // Call backend to generate and upload document
+      const response = await axios.post(`${url}/client/upload-document`);
+      
+      if (response.data) {
+        const digio = new window.Digio(digioOptions);
+        digio.init();
+        
+        const identifier = response.data.signing_parties?.[0]?.identifier;
+        const digioDocumentId = response.data.id;
+        
+        digio.submit(digioDocumentId, identifier);
+      }
+    } catch (err) {
+      console.error(err);
+      setErrorSign(err.response?.data?.error || "An error occurred while generating the contract.");
+    } finally {
+      setLoadingSign(false);
+    }
+  };
+
   // Render current field based on step
   const currentField = riskProfileFields[currentFieldIndex];
   const renderCurrentField = () => {
     if (currentStep === 1) { // Risk Profile Step
-     /* return(
+      return(
         <div className="form-group">
           <label htmlFor={currentField.name}>{currentField.label}</label>
           {currentField.note && <small className="form-note">{currentField.note}</small>}
@@ -568,31 +631,22 @@ const [file, setFile] = useState(null);
             />
           )}
         </div>
-      );*/
+      );
     } else if (currentStep === 2) { // Agreement Step
       return (
-        <div className="agreement-step">
-          {/* Your existing agreement UI */}
-          <div className="onboarding-step">
-          <h3>Step 2: Agreement Sign</h3>
-          <form onSubmit={handleAgreementSubmit}>
-            <label>
-              <input
-                type="checkbox"
-                checked={agreementSigned}
-                onChange={(e) => setAgreementSigned(e.target.checked)}
-              />
-              I agree to the terms and conditions
-            </label>
-            <button type="submit" className="btn-submit">Sign Agreement</button>
-          </form>
-          <div className="step-navigation">
-            <button onClick={handlePrevStep}>Back</button>
-            <button onClick={handleNextStep}>Next</button>
-          </div>
-        </div>
-        </div>
-      );
+        <div className="onboarding-step">
+      <h2>Generate Your Contract</h2>
+     
+        <button type="button" disabled={loadingSign} onClick={handleSubmitSign}>
+          {loadingSign ? 'Preparing Contract...' : 'Prepare Contract'}
+        </button>
+      
+
+      {errorSign && <div style={{ color: 'red' }}>{errorSign}</div>}
+      {successSign && <div>Document signed successfully!</div>}
+    </div>
+  );
+      
     }
     else if (currentStep === 3) { 
     // ... other steps ...

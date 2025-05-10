@@ -682,7 +682,7 @@ await new Promise((resolve, reject) => {
 
 
 
-function wrapText(text, maxCharsPerLine = 60) {
+/*function wrapText(text, maxCharsPerLine = 60) {
     const cleaned = text
         .replace(/\u00A0/g, ' ')
         .replace(/[\u2018\u2019]/g, "'")
@@ -707,14 +707,102 @@ function wrapText(text, maxCharsPerLine = 60) {
     }
 
     return lines.join('\n');
+
+}*/
+
+function wrapText(text, maxCharsPerLine = 60) {
+    const cleaned = text
+        .replace(/\u00A0/g, ' ')
+        .replace(/[\u2018\u2019]/g, "'")
+        .replace(/[\u201C\u201D]/g, '"')
+        .trim();
+
+    const words = cleaned.split(' ');
+    let lines = [];
+    let currentLine = '';
+
+    // Helper to break a long word on slash or hyphen
+    function breakWord(word) {
+        const delimiters = ['/', '-'];
+        let segments = [word];
+        let usedDelimiter = null;
+
+        for (let delimiter of delimiters) {
+            if (word.includes(delimiter)) {
+                segments = word.split(delimiter);
+                usedDelimiter = delimiter;
+                break;
+            }
+        }
+
+        let brokenLines = [];
+        let compoundLine = '';
+
+        for (let i = 0; i < segments.length; i++) {
+            let part = segments[i];
+            let withDelimiter = i < segments.length - 1 && usedDelimiter ? part + usedDelimiter : part;
+
+            if ((compoundLine + withDelimiter).length <= maxCharsPerLine) {
+                compoundLine += withDelimiter;
+            } else {
+                if (compoundLine.length) {
+                    brokenLines.push(compoundLine);
+                    compoundLine = withDelimiter;
+                } else {
+                    // Still too long — force-break this part
+                    let remaining = withDelimiter;
+                    while (remaining.length > maxCharsPerLine) {
+                        brokenLines.push(remaining.slice(0, maxCharsPerLine));
+                        remaining = remaining.slice(maxCharsPerLine);
+                    }
+                    compoundLine = remaining;
+                }
+            }
+        }
+
+        if (compoundLine) {
+            brokenLines.push(compoundLine);
+        }
+
+        return brokenLines;
+    }
+
+    for (let word of words) {
+        if (word.length > maxCharsPerLine) {
+            const brokenParts = breakWord(word);
+
+            for (let part of brokenParts) {
+                if ((currentLine + part).length <= maxCharsPerLine) {
+                    currentLine += part + ' ';
+                } else {
+                    lines.push(currentLine.trim());
+                    currentLine = part + ' ';
+                }
+            }
+        } else {
+            if ((currentLine + word).length <= maxCharsPerLine) {
+                currentLine += word + ' ';
+            } else {
+                lines.push(currentLine.trim());
+                currentLine = word + ' ';
+            }
+        }
+    }
+
+    if (currentLine.length) {
+        lines.push(currentLine.trim());
+    }
+
+    return lines.join('\n');
 }
+
 
 
 const { PDFDocument, rgb } = require('pdf-lib');
 //const fs = require('fs');
 //const path = require('path');
 
-router.get('/upload-document', protect, authorizeRoles('client'), upload.single('document'), async (req, res) => {
+router.post('/upload-document', protect, authorizeRoles('client'), upload.single('document'), async (req, res) => {
     try {
         const pdfOutputPath = path.join(config.UPLOAD_FOLDER, 'FilledContract.pdf');
         const userId = req.user._id;
@@ -786,9 +874,10 @@ router.get('/upload-document', protect, authorizeRoles('client'), upload.single(
          console.log(risk_profile_sheet_row_data[8])
          const Age = calculateAge(risk_profile_sheet_row_data[8]);
          
-         if (!Age) {
+        /* if (!Age) {
+            console.log(Age)
              return res.status(400).json({ error: "Age format does not match" });
-         }
+         }*/
  
          // Calculate EMI ratio
          const EMI_Income_ratio = parseInt(risk_profile_sheet_row_data[19]) / parseInt(risk_profile_sheet_row_data[16]);
@@ -1197,7 +1286,7 @@ fifteenthPage.drawText(String(clientRiskData.dependentSiblings),{
 
 let sourceOfIncome = String(String(clientRiskData.sourceOfIncome));
 console.log(sourceOfIncome)
-sourceOfIncome = wrapText(sourceOfIncome, 15); // Gives \n-separated lines
+sourceOfIncome = wrapText(sourceOfIncome, 8); // Gives \n-separated lines
 let sentences = sourceOfIncome.split('\n');
  startX = 41;
 startY = height - 409;
@@ -1298,12 +1387,12 @@ fifteenthPage.drawText(`${LOE_Date.day}-${LOE_Date.month}-${LOE_Date.year}`, {
             color: rgb(0, 0, 0),
         });
         
-        firstPage.drawText(risk_assessment.toUpperCase(), {
+        /*firstPage.drawText(risk_assessment.toUpperCase(), {
             x: 100,
             y: height - 140,
             size: 12,
             color: rgb(0, 0, 0),
-        });
+        });*/
 
         const eleventhPage = pages[10];
         eleventhPage.drawText(Salutation, {
@@ -1312,7 +1401,31 @@ fifteenthPage.drawText(`${LOE_Date.day}-${LOE_Date.month}-${LOE_Date.year}`, {
             size: 12,
             color: rgb(0, 0, 0),
         });
+
+
+         const thirdPage = pages[2];
+        thirdPage.drawText(`${LOE_Date.day} of ${LOE_Date.month} ${LOE_Date.year}`, {
+            x: 278,
+            y: height - 77,
+            size: 10,
+            color: rgb(0, 0, 0),
+        });
         
+        
+        thirdPage.drawText(Salutation, {
+            x: 313,
+            y: height - 207,
+            size: 10,
+            color: rgb(0, 0, 0),
+        });
+
+         
+        thirdPage.drawText(Salutation, {
+            x: 87,
+            y: height - 94,
+            size: 10,
+            color: rgb(0, 0, 0),
+        });
         // Add more fields as needed...
 
         // Save the modified PDF
@@ -1362,8 +1475,9 @@ fifteenthPage.drawText(`${LOE_Date.day}-${LOE_Date.month}-${LOE_Date.year}`, {
                 console.error("Cleanup error:", err);
             }
         }
-
-        res.json(response.data);
+        console.log(response.data)
+       return res.json(response.data);
+       //return response.json()
 
     } catch (error) {
         console.error(error);
