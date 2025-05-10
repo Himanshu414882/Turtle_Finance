@@ -1008,7 +1008,7 @@ router.post('/upload-document', protect, authorizeRoles('client'), upload.single
             color: rgb(0, 0, 0),
         });
 
-        firstPage.drawText(risk_profile_sheet_row_data[2]+' '+risk_profile_sheet_row_data[3], {
+        firstPage.drawText(risk_profile_sheet_row_data[2], {
             x: 109,
             y: height-640,
             size: 12,

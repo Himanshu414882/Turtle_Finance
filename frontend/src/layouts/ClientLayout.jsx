@@ -269,8 +269,8 @@ const ClientLayout = () => {
           label: 'I am a novice. I don\u2019t understand the markets at all' },
         { value: 'I have basic understanding of investing. I understand the risks and basic investment', 
           label: 'I have basic understanding of investing. I understand the risks and basic investment' },
-        { value: 'I have an amateur interest in investing. I have invested earlier on my own. I understand how markets fluctuate and the pros and cons of different investment classes.3-5 years', 
-          label: 'I have an amateur interest in investing. I have invested earlier on my own. I understand how markets fluctuate and the pros and cons of different investment classes. (3\u20135 years)' },
+        { value: 'I have an amateur interest in investing. I have invested earlier on my own. I understand how markets fluctuate and the pros and cons of different investment classes.', 
+          label: 'I have an amateur interest in investing. I have invested earlier on my own. I understand how markets fluctuate and the pros and cons of different investment classes.' },
         { value: 'I am an experienced investor. I have invested in different markets and understand different investment strategies. I have my own investment philosophy.', 
           label: 'I am an experienced investor. I have invested in different markets and understand different investment strategies. I have my own investment philosophy.' }
       ],
