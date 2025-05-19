@@ -596,7 +596,7 @@ const [file, setFile] = useState(null);
   const currentField = riskProfileFields[currentFieldIndex];
   const renderCurrentField = () => {
     if (currentStep === 1) { // Risk Profile Step
-      return(
+     /* return(
         <div className="form-group">
           <label htmlFor={currentField.name}>{currentField.label}</label>
           {currentField.note && <small className="form-note">{currentField.note}</small>}
@@ -631,7 +631,7 @@ const [file, setFile] = useState(null);
             />
           )}
         </div>
-      );
+      );*/
     } else if (currentStep === 2) { // Agreement Step
       return (
         <div className="onboarding-step">

@@ -10,6 +10,8 @@ import EditMeetings from '../pages/AdminView/Meetings/EditMeetings'
 import AllTasks from '../pages/AdminView/Tasks/AllTasks'
 import EditTasks from '../pages/AdminView/Tasks/EditTasks'
 import AddTasks from '../pages/AdminView/Tasks/AddTasks'
+import AddUsers from '../pages/AdminView/Users/AddUser'
+import UpdateSubscriptionPrice from '../pages/AdminView/Subscription/UpdateSubscriptionPrice'
 
 const AdminRoutes = () => {
   // Declare routes here
@@ -25,7 +27,10 @@ const AdminRoutes = () => {
 
     {path:'/admin/rowwisetasks', element:<AllTasks/>},
     { path: '/admin/rowwisetasks/:id/editRowWiseTasks', element: <EditTasks /> },
-    { path: '/admin/rowwisetasks/addTask', element: <AddTasks /> }
+    { path: '/admin/rowwisetasks/addTask', element: <AddTasks /> },
+
+    {path:'/admin/addUsers', element:<AddUsers/>},
+    {path:'/admin/updateSubscriptionPrice', element:<UpdateSubscriptionPrice/>},
   ]
 
   // Return all routes using useRoutes

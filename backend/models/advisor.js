@@ -3,6 +3,12 @@ const { v4: uuidv4 } = require('uuid');
 
 const AdvisorSchema = new mongoose.Schema(
     {
+        userId: {
+             type: mongoose.Schema.Types.ObjectId,
+             ref: "User", // assuming there's a User model
+            //required: true,
+            unique: true,
+            },
         advisorId: {
             type: String,  
             default: uuidv4, 
@@ -28,8 +34,8 @@ const AdvisorSchema = new mongoose.Schema(
         },
         phone: {
             type: String, 
-            required: true,
-            unique: true,
+           // required: true,
+           // unique: true,
         },
         email: {
             type: String,

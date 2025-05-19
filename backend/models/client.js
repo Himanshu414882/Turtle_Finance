@@ -3,6 +3,12 @@ const { v4: uuidv4 } = require("uuid");
 
 const ClientSchema = new mongoose.Schema(
     {
+        userId: {
+                    type: mongoose.Schema.Types.ObjectId,
+                    ref: "User", // assuming there's a User model
+                    //required: true,
+                    unique: true,
+                },
         clientId: {
             type: String,
             default: uuidv4,
@@ -43,7 +49,8 @@ const ClientSchema = new mongoose.Schema(
         phone: {
             type: String,
             unique: true,
-            required: true,
+            sparse: true,
+           // required: true,
         },
         email: {
             type: String,
@@ -96,6 +103,13 @@ const ClientSchema = new mongoose.Schema(
             type: Date,
             default: null,
         },
+
+         clientType: {
+            type: String,
+            enum: ["Indian","NRI"],
+            //default: null,
+        },
+
         riaData: {
             type: mongoose.Schema.Types.ObjectId,
             ref: "RiaData",

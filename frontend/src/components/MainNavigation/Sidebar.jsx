@@ -6,6 +6,8 @@ import { FaListOl, FaBars } from "react-icons/fa";
 import brandlogo from "../../assets/images/logo_png.png";
 import { Link, useLocation } from "react-router-dom";
 import styles from "../../styles/Sidebar/Sidebar.module.css";
+import { FaUserPlus } from "react-icons/fa"; // replace or add this import at the top
+import { FaDollarSign } from 'react-icons/fa'; // example icon
 
 const Sidebar = ({ sidebarRef, isSidebarOpen, toggleSidebar, backdrop, scroll }) => {
   const location = useLocation();
@@ -61,7 +63,35 @@ const Sidebar = ({ sidebarRef, isSidebarOpen, toggleSidebar, backdrop, scroll })
             <span className={`${isSidebarOpen ? "d-inline-block" : "d-none"}`}>Tasks</span>
           </div>
         </Link>
+
+         <Link to={`${basePath}/admin/addUsers`} className={`${styles.navLinks} ${isSidebarOpen ? "d-flex align-items-center w-100 p-2 mb-2" : "d-flex  align-items-center justify-content-center w-100 p-2 mb-2"} ${location.pathname === `${basePath}/admin/addUsers` ? styles.active : ""}`}>
+          <div className={styles.navLinksIcons}>
+            <FaUserPlus className={` ${isSidebarOpen ? "me-3" : ""}`} />
+            <span className={`${isSidebarOpen ? "d-inline-block" : "d-none"}`}>Add User</span>
+          </div>
+        </Link>
       </div>
+
+
+        <Link
+      to={`${basePath}/admin/updateSubscriptionPrice`}
+      className={`${styles.navLinks} ${
+        isSidebarOpen
+          ? "d-flex align-items-center w-100 p-2 mb-2"
+          : "d-flex align-items-center justify-content-center w-100 p-2 mb-2"
+      } ${
+        location.pathname === `${basePath}/admin/updateSubscriptionPrice`
+          ? styles.active
+          : ""
+      }`}
+    >
+      <div className={styles.navLinksIcons}>
+        <FaDollarSign className={`${isSidebarOpen ? "me-3" : ""}`} />
+        <span className={`${isSidebarOpen ? "d-inline-block" : "d-none"}`}>
+          Update Subscription Price
+        </span>
+      </div>
+    </Link>
 
       {/* Footer */}
       {/* <div className={`mt-auto p-2 d-flex align-items-center ${styles.footerContainer}`}>

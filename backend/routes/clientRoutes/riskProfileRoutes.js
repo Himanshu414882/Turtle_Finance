@@ -802,6 +802,9 @@ const { PDFDocument, rgb } = require('pdf-lib');
 //const fs = require('fs');
 //const path = require('path');
 
+
+
+
 router.post('/upload-document', protect, authorizeRoles('client'), upload.single('document'), async (req, res) => {
     try {
         const pdfOutputPath = path.join(config.UPLOAD_FOLDER, 'FilledContract.pdf');
@@ -850,7 +853,7 @@ router.post('/upload-document', protect, authorizeRoles('client'), upload.single
         
         const signer_email = 'hs414882@gmail.com';
         const signer_name = clientRiskData.fullName;
-        const pdfTemplatePath = path.join('static', 'ContractTemplate.pdf'); // Change to PDF template
+        const pdfTemplatePath = path.join('static', 'ContractTemplateNRI.pdf'); // Change to PDF template
 
         // Load the PDF template
         const existingPdfBytes = fs.readFileSync(pdfTemplatePath);
@@ -996,7 +999,7 @@ router.post('/upload-document', protect, authorizeRoles('client'), upload.single
 
         firstPage.drawText(Salutation, {
             x: 109,
-            y: height-584,
+            y: height-576,
             size: 12,
             color: rgb(0, 0, 0),
         });
@@ -1484,6 +1487,8 @@ fifteenthPage.drawText(`${LOE_Date.day}-${LOE_Date.month}-${LOE_Date.year}`, {
         res.status(500).json({ error: error.message });
     }
 });
+
+
 
 
 

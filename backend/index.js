@@ -14,6 +14,7 @@ const { firefliesRouter } = require('./fireFlies/fetchFromFireflies');
 const { rowWiseTaskRoutes } = require('./routes/rowWiseTaskRoutes');
 const { riskProfileRoutes } = require('./routes/clientRoutes/riskProfileRoutes')
 const kycRoutes = require("./routes/clientRoutes/kycRoutes");
+const subscriptionPlan = require("./routes/adminRoutes/subscriptionPlan");
 const cors = require('cors');
 
 // Initialize constants
@@ -41,7 +42,7 @@ app.use('/admin',advisorRoutes);
 app.use('/admin',firefliesRouter);
 app.use('/admin',meetingAndTasksRoutes);
 app.use('/admin',rowWiseTaskRoutes);
-
+app.use('/admin',subscriptionPlan);
 app.use('/client',riskProfileRoutes);
 app.use("/client", kycRoutes);
 

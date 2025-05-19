@@ -2,6 +2,8 @@ const express = require('express');
 const passport = require('passport');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
+const Client = require('../models/client'); //
+const Advisor = require('../models/advisor'); //
 const router = express.Router();
 require('dotenv').config();
 
@@ -49,7 +51,7 @@ router.post('/login', (req, res, next) => {
 
 
 // Register
-router.post('/register', async (req, res) => {
+/*router.post('/register', async (req, res) => {
   const { name, email, password, role } = req.body;
 
   try {
@@ -60,6 +62,66 @@ router.post('/register', async (req, res) => {
     sendTokenResponse(user, res); // Sends cookie and user info
   } catch (err) {
     res.status(500).json({ message: 'Registration failed', error: err.message });
+  }
+});*/
+
+
+
+
+router.post('/register', async (req, res) => {
+  const { name, email, password, role, clientType } = req.body;
+
+  if (!name || !email || !password || !role) {
+    return res.status(400).json({ message: 'All fields are required' });
+  }
+
+  const allowedRoles = ['admin', 'client', 'advisor'];
+  if (!allowedRoles.includes(role)) {
+    return res.status(400).json({ message: 'Invalid role specified' });
+  }
+
+  try {
+    let existingUser = await User.findOne({ email });
+    if (existingUser) {
+      return res.status(400).json({ message: 'User already exists' });
+    }
+
+   
+    const user = await User.create({ name, email, password, role });
+
+    // If user is a client, also add to Client model
+    if (role === 'client') {
+      try {
+        await Client.create({ userId: user._id, fullName: name, email: email, clientType: clientType});
+      } catch (clientErr) {
+        // Roll back user if client creation fails
+        await User.findByIdAndDelete(user._id);
+        return res.status(500).json({
+          message: 'Client creation failed, user rolled back',
+          error: clientErr.message
+        });
+      }
+    
+     // await Client.create({ user: user._id, fullName:name, email:email, clientType:clientType });
+    }
+    else if(role === 'advisor'){
+      try {
+        await Advisor.create({ userId: user._id, advisorFullName: name, email: email});
+      } catch (advisorErr) {
+        // Roll back user if client creation fails
+        await User.findByIdAndDelete(user._id);
+        return res.status(500).json({
+          message: 'Advisor creation failed, user rolled back',
+          error: advisorErr.message
+        });
+      }
+    }
+   
+
+    sendTokenResponse(user, res);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ message: 'Registration failed' });
   }
 });
 
