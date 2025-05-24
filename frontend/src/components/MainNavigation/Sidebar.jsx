@@ -93,6 +93,24 @@ const Sidebar = ({ sidebarRef, isSidebarOpen, toggleSidebar, backdrop, scroll })
       </div>
     </Link>
 
+
+
+
+     <Link
+      to={`${basePath}/admin/assignAdvisorToClient`}
+      className={`${styles.navLinks} ${
+        isSidebarOpen
+          ? "d-flex align-items-center w-100 p-2 mb-2"
+          : "d-flex align-items-center justify-content-center w-100 p-2 mb-2"
+      } ${
+        location.pathname === `${basePath}/admin/assignAdvisorToClient`
+          ? styles.active
+          : ""
+      }`}
+    >
+      Assign Advisor to Client
+    </Link>
+
       {/* Footer */}
       {/* <div className={`mt-auto p-2 d-flex align-items-center ${styles.footerContainer}`}>
         <Link to="/logout" className={`${styles.navLinks} ${isSidebarOpen ? "d-flex align-items-center w-100 p-2 " : "d-flex  align-items-center justify-content-center w-100 p-2 "}`}>

@@ -9,6 +9,8 @@ const EditAdvisors = () => {
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
     const [formData, setFormData] = useState(null);
+     const [profilePicture, setProfilePicture] = useState(null);
+    const [previewImage, setPreviewImage] = useState("");
 
     const fullNameRef = useRef();
     const salutationRef = useRef();
@@ -19,6 +21,12 @@ const EditAdvisors = () => {
     const addressRef = useRef();
     const dobRef = useRef();
     const genderRef = useRef();
+
+    const qualificationRef = useRef();
+    const experienceRef = useRef();
+    const credentialsRef = useRef();
+    const bioRef = useRef();
+     const fileInputRef = useRef();
 
     const fetchAdvisorData = async (signal) => {
         try {
@@ -35,6 +43,14 @@ const EditAdvisors = () => {
                 ...data,
                 dob: formatDate(data.dob),
             });
+
+            
+
+            if (data.profilePictureId) {
+    setPreviewImage(`${url}/files/${data.profilePictureId}`);
+}
+
+
         } catch (error) {
             console.error("Error fetching advisor data:", error);
         }
@@ -46,6 +62,15 @@ const EditAdvisors = () => {
         return () => controller.abort();
     }, [id]);
 
+
+      const handleFileChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setProfilePicture(file);
+            setPreviewImage(URL.createObjectURL(file));
+        }
+    };
+
     const getValueOrNull = (ref) => {
         const value = ref.current?.value?.trim();
         return value === "" ? null : value;
@@ -55,20 +80,34 @@ const EditAdvisors = () => {
         e.preventDefault();
         setLoading(true);
 
-        const updatedData = {
-            advisorFullName: getValueOrNull(fullNameRef),
-            salutation: getValueOrNull(salutationRef),
-            advisorDomain: getValueOrNull(advisorDomainRef),
-            countryCode: getValueOrNull(countryCodeRef),
-            phone: getValueOrNull(phoneRef),
-            email: getValueOrNull(emailRef),
-            address: getValueOrNull(addressRef),
-            dob: getValueOrNull(dobRef),
-            gender: getValueOrNull(genderRef),
-        };
+       const updatedData = new FormData();
+updatedData.append('advisorFullName', getValueOrNull(fullNameRef));
+updatedData.append('salutation', getValueOrNull(salutationRef));
+updatedData.append('advisorDomain', getValueOrNull(advisorDomainRef));
+updatedData.append('countryCode', getValueOrNull(countryCodeRef));
+updatedData.append('phone', getValueOrNull(phoneRef));
+updatedData.append('email', getValueOrNull(emailRef));
+updatedData.append('address', getValueOrNull(addressRef));
+updatedData.append('dob', getValueOrNull(dobRef));
+updatedData.append('gender', getValueOrNull(genderRef));
+updatedData.append('qualification', getValueOrNull(qualificationRef));
+updatedData.append('experience', getValueOrNull(experienceRef));
+updatedData.append('credentials', getValueOrNull(credentialsRef));
+updatedData.append('bio', getValueOrNull(bioRef));
+
+if (profilePicture) {
+    updatedData.append('profilePicture', profilePicture);
+}
+
 
         try {
-            await axios.patch(`${url}/admin/advisors/${id}/editAdvisors`, updatedData);
+            await axios.patch(`${url}/admin/advisors/${id}/editAdvisors`, updatedData,
+                {
+                    headers: {
+                        'Content-Type': 'multipart/form-data'
+                    }
+                }
+            );
             alert("Advisor data updated successfully!");
             navigate("/adminautharized/admin/advisors");
         } catch (error) {
@@ -88,6 +127,67 @@ const EditAdvisors = () => {
                     <h2 className="mb-4">Edit Advisor</h2>
                     
                     <form onSubmit={handleSubmit}>
+
+             {/* Profile Picture Upload */}
+                        <div className="row mb-4">
+                            <div className="col-md-6">
+                                <label className="form-label">Profile Picture</label>
+                                <div className="d-flex align-items-center">
+                                    {previewImage && (
+                                        <img 
+                                            src={previewImage} 
+                                            alt="Profile Preview" 
+                                            className="rounded-circle me-3"
+                                            style={{ width: '80px', height: '80px', objectFit: 'cover' }}
+                                        />
+                                    )}
+                                    <div>
+                                        <input 
+                                            type="file" 
+                                            ref={fileInputRef}
+                                            onChange={handleFileChange}
+                                            accept="image/*"
+                                            className="form-control"
+                                            style={{ display: 'none' }}
+                                        />
+                                        <button
+                                            type="button"
+                                            className="btn btn-outline-secondary"
+                                            onClick={() => fileInputRef.current.click()}
+                                        >
+                                            {profilePicture ? 'Change Image' : 'Upload Image'}
+                                        </button>
+                                        {profilePicture && (
+                                            <button
+                                                type="button"
+                                                className="btn btn-link text-danger ms-2"
+                                                onClick={() => {
+  setProfilePicture(null);
+  setPreviewImage(formData.profilePictureId?._id ?
+  `${url}/files/${formData.profilePictureId._id}` : "");
+  fileInputRef.current.value = "";
+}}
+                                            >
+                                                Remove
+                                            </button>
+                                        )}
+                                    </div>
+                                </div>
+                                <small className="text-muted">Max file size: 5MB (JPEG, PNG)</small>
+                            </div>
+                        </div>
+
+
+
+
+
+
+
+
+
+
+
+
                         <div className="row mb-3">
                             <div className="col-md-6">
                                 <label className="form-label">Full Name</label>
@@ -143,6 +243,30 @@ const EditAdvisors = () => {
                                 </select>
                             </div>
                         </div>
+
+
+                        <div className="row mb-3">
+    <div className="col-md-6">
+        <label className="form-label">Qualification</label>
+        <input type="text" className="form-control" ref={qualificationRef} defaultValue={formData.qualification} />
+    </div>
+    <div className="col-md-6">
+        <label className="form-label">Experience (in years)</label>
+        <input type="number" className="form-control" ref={experienceRef} defaultValue={formData.experience} />
+    </div>
+</div>
+
+<div className="row mb-3">
+    <div className="col-md-6">
+        <label className="form-label">Credentials</label>
+        <input type="text" className="form-control" ref={credentialsRef} defaultValue={formData.credentials} />
+    </div>
+</div>
+
+<div className="mb-4">
+    <label className="form-label">Advisor Bio</label>
+    <textarea className="form-control" ref={bioRef} defaultValue={formData.bio} rows="5" />
+</div>
 
                         <div className="d-flex justify-content-end">
                             <button type="submit" className="btn btn-turtle-primary" disabled={loading}>

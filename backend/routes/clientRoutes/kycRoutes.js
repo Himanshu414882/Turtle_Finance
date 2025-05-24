@@ -212,6 +212,7 @@ const router = express.Router();
 const multer = require('multer');
 const File  = require('../../models/fileModel'); // Import your models
 const KYC  = require('../../models/kycData');
+const Client = require('../../models/client')
 
 // Configure Multer for file uploads
 const upload = multer({
@@ -233,11 +234,22 @@ router.post('/aadhaar',protect,authorizeRoles("client"), upload.single('aadhaar'
     console.log('REQ.FILE:', req.file);
 console.log('REQ.BODY:', req.body);
     try {
-      const { userId, clientId } = req.body; // Or get from auth middleware
+      const  userId  =  req.user._id;; // Or get from auth middleware
       
       if (!req.file) {
         return res.status(400).json({ error: 'No file uploaded' });
       }
+
+       // Find the corresponding client document for this user
+             const client = await Client.findOne({ userId: req.user._id });
+              if (!client) {
+                  return res.status(404).json({ msg: "Client not found for this user." });
+              }
+      
+              // Add clientId to the risk data
+              const clientId = client._id;
+      console.log(clientId);
+      
   
       // Create file record
       const aadhaarFile = new File({
@@ -254,7 +266,12 @@ console.log('REQ.BODY:', req.body);
       // Update KYC record
       const kycRecord = await KYC.findOneAndUpdate(
         { userId: req.user._id },
-        { $set: { aadhaarFileId: savedFile._id } },
+        
+        { $set: 
+          {
+          clientId: client._id,
+           aadhaarFileId: savedFile._id 
+         } },
         { upsert: true, new: true }
       );
   
@@ -263,7 +280,7 @@ console.log('REQ.BODY:', req.body);
         fileId: savedFile._id,
         kycId: kycRecord._id
       });
-  
+   
     } catch (error) {
       console.error('Error uploading Aadhaar:', error);
       res.status(500).json({ error: 'Failed to upload document' });
@@ -273,11 +290,23 @@ console.log('REQ.BODY:', req.body);
   router.post('/pan', protect, authorizeRoles("client"), upload.single('pan'), async (req, res) => {
     try {
       // Get user ID from auth middleware (assuming protect middleware adds req.user)
-      const { userId, clientId } = req.body; // Or get from auth middleware
+      const  userId = req.user._id; // Or get from auth middleware
       
       if (!req.file) {
         return res.status(400).json({ error: 'No PAN card file uploaded' });
       }
+
+
+       const client = await Client.findOne({ userId: req.user._id });
+              if (!client) {
+                  return res.status(404).json({ msg: "Client not found for this user." });
+              }
+      
+              // Add clientId to the risk data
+              const clientId = client._id;
+      console.log(clientId);
+
+
 
       // Validate PAN card file (example: check if it's PDF or image)
       const allowedTypes = ['application/pdf', 'image/jpeg', 'image/png'];
@@ -292,7 +321,7 @@ console.log('REQ.BODY:', req.body);
         size: req.file.size,
         data: req.file.buffer,
         uploadedBy: userId,
-        clientId: clientId, // Assuming clientId is stored in user object
+       // clientId: clientId, // Assuming clientId is stored in user object
         documentType: 'pan' // Add document type for easier identification
       });
 
@@ -300,10 +329,15 @@ console.log('REQ.BODY:', req.body);
 
       // Update KYC record
       const kycRecord = await KYC.findOneAndUpdate(
-        { userId: req.user._id },
-        { $set: { panFileId: savedFile._id } },
-        { upsert: true, new: true }
-      );
+  { userId: req.user._id },
+  {
+    $set: {
+      clientId: client._id,
+      panFileId: savedFile._id
+    }
+  },
+  { upsert: true, new: true }
+);
 
       res.status(201).json({
         success: true,

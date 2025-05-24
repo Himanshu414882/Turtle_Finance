@@ -54,7 +54,27 @@ const AdvisorSchema = new mongoose.Schema(
             type: String,
             enum: ["Male", "Female", "Other"],
             default: null,
-        }
+        },
+        qualification: {
+            type: String,
+
+        },
+        experience:{
+            type: Number,
+        },
+        credentials:{
+            type:String
+        },
+        bio: {
+            type: String,
+            default: null,
+        },
+        profilePictureId: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "File",
+        required: false,
+      },
+
     },
     { timestamps: true }
 );

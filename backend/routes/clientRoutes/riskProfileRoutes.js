@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const RiskProfile = require('../../models/riskProfile');
+const Client = require('../../models/client')
+
 const { protect, authorizeRoles } = require('../../middleware/authMiddleware'); // Import middleware
 
 const fs = require('fs');
@@ -71,6 +73,18 @@ router.post('/addRiskData', protect, authorizeRoles('client'), async (req, res) 
         if (existingProfile) {
             return res.status(400).json({ msg: "Risk profile already submitted by this user." });
         }
+        
+          // Find the corresponding client document for this user
+       const client = await Client.findOne({ userId: req.user._id });
+        if (!client) {
+            return res.status(404).json({ msg: "Client not found for this user." });
+        }
+
+        // Add clientId to the risk data
+        clientRiskData.clientId = client._id;
+
+
+
 
         await RiskProfile.create(clientRiskData);
         res.status(200).json({ msg: "Client risk data has been added successfully." });

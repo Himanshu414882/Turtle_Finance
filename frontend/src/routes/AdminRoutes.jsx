@@ -12,12 +12,19 @@ import EditTasks from '../pages/AdminView/Tasks/EditTasks'
 import AddTasks from '../pages/AdminView/Tasks/AddTasks'
 import AddUsers from '../pages/AdminView/Users/AddUser'
 import UpdateSubscriptionPrice from '../pages/AdminView/Subscription/UpdateSubscriptionPrice'
+import ClientRiskProfile from '../pages/AdminView/Clients/ClientRiskProfile'
+import AssignAdvisorToClient from '../pages/AdminView/AssignAdvisorToClient/AssignAdvisorToClient'
 
 const AdminRoutes = () => {
   // Declare routes here
   const routes = [
+     
+     { path: '/admin/AssignAdvisorToClient', element: <AssignAdvisorToClient /> },
+
     { path: '/admin/clients', element: <AllClients /> },
     { path: '/admin/clients/:id/editClients', element: <EditClients /> },
+    { path: '/admin/clients/:clientId/riskProfile', element: <ClientRiskProfile /> },
+    
 
     { path: '/admin/advisors', element: <AllAdvisors /> },
     { path: '/admin/advisors/:id/editAdvisors', element: <EditAdvisors /> },
@@ -31,6 +38,7 @@ const AdminRoutes = () => {
 
     {path:'/admin/addUsers', element:<AddUsers/>},
     {path:'/admin/updateSubscriptionPrice', element:<UpdateSubscriptionPrice/>},
+   
   ]
 
   // Return all routes using useRoutes

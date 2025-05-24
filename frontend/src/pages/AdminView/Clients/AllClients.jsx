@@ -10,6 +10,8 @@ import SearchFilter from "../../../components/SmallerComponents/SearchFilter";
 import { IoFilter } from "react-icons/io5";
 import { FaRegEdit } from "react-icons/fa";
 import { RiDeleteBin6Line } from "react-icons/ri";
+import { FaRegEye } from "react-icons/fa";
+import { FiDownload } from "react-icons/fi";
 
 const AllClients = () => {
     axios.defaults.withCredentials = true
@@ -56,6 +58,33 @@ const AllClients = () => {
             setLoadingId(null);
         }
     }
+
+
+    const handleDownload = async (type, clientId) => {
+    try {
+        const response = await axios.get(`${url}/admin/clients/${type}/download/${clientId}`, {
+            responseType: 'blob', // Required for file download
+        });
+
+        const fileBlob = new Blob([response.data]);
+        const downloadUrl = window.URL.createObjectURL(fileBlob);
+        const link = document.createElement('a');
+        link.href = downloadUrl;
+
+        // Optional: Add file extension based on response content-type
+        const extension = response.headers['content-type'].includes('pdf') ? '.pdf' : '';
+        link.download = `${type.toUpperCase()}_${clientId}${extension}`;
+
+        document.body.appendChild(link);
+        link.click();
+        link.remove();
+        window.URL.revokeObjectURL(downloadUrl);
+    } catch (error) {
+        console.error(`Error downloading ${type} document:`, error);
+        alert(`Failed to download ${type.toUpperCase()} document`);
+    }
+};
+
 
 
     // ✅ Filter logic: Runs whenever columnFilter or clients change
@@ -190,12 +219,45 @@ const AllClients = () => {
                     <Link to={`/adminautharized/admin/clients/${row.original._id}/editClients`} className="btn  p-2  btn-outline-turtle-secondary">
                         <FaRegEdit className="d-block fs-6" />
                     </Link>
+
+                     <Link
+                to={`/adminautharized/admin/clients/${row.original._id}/riskProfile`}
+                className="btn p-2 btn-outline-turtle-secondary"
+            >
+                <FaRegEye className="d-block fs-6" title="View Risk Profile" />
+            </Link>
+
+
+{/* Aadhaar Download */}
+  <button
+    onClick={() => handleDownload('aadhaar', row.original._id)}
+    className="btn p-2 btn-outline-primary flex items-center gap-1"
+    title="Download Aadhaar"
+  >
+    <FiDownload className="text-xl" />
+    
+  </button>
+
+  {/* PAN Download */}
+  <button
+    onClick={() => handleDownload('pan', row.original._id)}
+    className="btn p-2 btn-outline-secondary flex items-center gap-1"
+    title="Download PAN"
+  >
+    <FiDownload className="text-xl" />
+   
+  </button>
+
+ 
+
                     <button onClick={() => { handleDelete(row.original._id) }} disabled={loadingId === row.original._id} className="btn  p-2  btn-outline-turtle-secondary">
                         {loadingId === row.original._id ? "Deleting..." : <RiDeleteBin6Line className="d-block fs-6" />}
                     </button>
                 </div>
             ),
         },
+
+        
     ];
 
 

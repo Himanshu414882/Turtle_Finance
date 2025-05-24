@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect  } from "react";
 import axios from "axios";
 
 const UpdateSubscriptionPlan = () => {
@@ -6,8 +6,35 @@ const UpdateSubscriptionPlan = () => {
   const [priceRupees, setPriceRupees] = useState("");
   const [priceDollar, setPriceDollar] = useState("");
   const [loading, setLoading] = useState(false);
+   const [fetching, setFetching] = useState(false);
 
   const url = import.meta.env.VITE_URL; // your base API URL
+
+
+    // Fetch plan details whenever planName changes
+  useEffect(() => {
+    const fetchPlanDetails = async () => {
+      setFetching(true);
+      try {
+        const res = await axios.get(`${url}/admin/getPlanByName/${planName}`, {
+          withCredentials: true,
+        });
+        const plan = res.data.plan;
+        setPriceRupees(plan.priceRupees || "");
+        setPriceDollar(plan.priceDollar || "");
+      } catch (error) {
+        console.error("Error fetching plan:", error?.response?.data || error.message || error);
+        alert("Failed to fetch plan data. See console for details.");
+        setPriceRupees("");
+        setPriceDollar("");
+      } finally {
+        setFetching(false);
+      }
+    };
+
+    fetchPlanDetails();
+  }, [planName, url]);
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -28,15 +55,15 @@ const UpdateSubscriptionPlan = () => {
       await axios.put(
         `${url}/admin/updatePlanByName/${planName}`,
         {
-          priceRupees: Number(priceRupees),
-          priceDollar: planName === "NRI" ? Number(priceDollar) : undefined,
+           priceRupees: priceRupees, // keep as string
+           priceDollar: planName === "NRI" ? priceDollar : undefined,
         },
         { withCredentials: true }
       );
       alert(`Plan '${planName}' updated successfully!`);
       // Reset or do something after success if needed
     } catch (error) {
-      console.error("Error updating plan:", error.response || error);
+      console.error("Error updating plan:",  error?.response?.data || error.message || error);
       alert("Failed to update plan. See console for details.");
     } finally {
       setLoading(false);
@@ -89,7 +116,7 @@ const UpdateSubscriptionPlan = () => {
               Price in Rupees
             </label>
             <input
-              type="number"
+              type="text"
               id="priceRupees"
               className="form-control"
               value={priceRupees}
@@ -106,7 +133,7 @@ const UpdateSubscriptionPlan = () => {
                 Price in Dollar
               </label>
               <input
-                type="number"
+                type="text"
                 id="priceDollar"
                 className="form-control"
                 value={priceDollar}

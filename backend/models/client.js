@@ -135,6 +135,13 @@ const ClientSchema = new mongoose.Schema(
             ref: "CreditCardData",
             default: null,
         },
+
+         advisors: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: "Advisor",
+            },
+        ],
     },
     { timestamps: true }
 );

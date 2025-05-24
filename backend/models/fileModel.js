@@ -31,7 +31,11 @@ const FileSchema = new mongoose.Schema({
   clientId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Client"
-  }
+  },
+  advisorId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Advisor"
+  },
 }, { timestamps: true });
 
 const File = mongoose.model("File", FileSchema);

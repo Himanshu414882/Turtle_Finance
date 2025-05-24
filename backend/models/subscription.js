@@ -9,12 +9,12 @@ const SubscriptionPlanSchema = new mongoose.Schema({
     unique: true,
   },
   priceRupees: {
-    type: Number,
+    type: String,
     required: true,
     min: 0,
   },
   priceDollar: {
-    type: Number,
+    type: String,
    // required: true,
     min: 0,
   },
